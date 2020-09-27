@@ -6,8 +6,7 @@
     "lint": "tslint --project \"tsconfig.json\"",
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon",
-    "test": "nodemon --config ./spec/nodemon.json",
-    "coverage": "nyc -r text -e .ts -x \"spec/*.spec.ts\" npm run test"
+    "test": "nodemon --config ./spec/nodemon.json"
   },
   "nodemonConfig": {
     "watch": [
@@ -17,7 +16,7 @@
     "ignore": [
       "src/public"
     ],
-    "exec": "ts-node -r tsconfig-paths/register ./src"
+    "exec": "node -r ts-node/register --inspect -r tsconfig-paths/register ./src"
   },
   "_moduleAliases": {
     "@daos": "dist/daos",
@@ -58,7 +57,6 @@
     "fs-extra": "^9.0.1",
     "jasmine": "^3.6.1",
     "nodemon": "^2.0.4",
-    "nyc": "^15.1.0",
     "supertest": "^5.0.0",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",

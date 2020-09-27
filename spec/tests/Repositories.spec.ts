@@ -2,13 +2,13 @@ import supertest from 'supertest';
 import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
 import { Response, SuperTest, Test } from 'supertest';
 import faker from 'faker';
+import axios from 'axios';
 
 import app from '@server';
 import RepositoriesDao from '@daos/Repositories/RepositoriesDao';
 import Repository, { IRepository } from '@entities/Repository';
 import { pErr } from '@shared/functions';
-import { paramMissingError } from '@shared/constants';
-
+import logger from '@shared/Logger';
 
 describe('Repositories Routes', () => {
 
@@ -85,6 +85,41 @@ describe('Repositories Routes', () => {
                     done();
                 });
         });
+        
+        it(`should mount a default url in axios endpoint`, (done) => {
+
+            const axiosSpy = spyOn(axios, "get").and.returnValue(
+                Promise.resolve({ data: { items: [] } }
+            ));
+            
+            agent.get(searchPath).end((err: Error, res: Response) => {
+              pErr(err);
+              expect(axiosSpy.calls.mostRecent().args[0]).toEqual(
+                'https://api.github.com/search/repositories?q=created:>2020-09-20&sort=starts&order=desc&page=0&per_page=100'
+              );
+              done();
+            });      
+        });
+
+        it(`should mount a url in axios with not default values`, (done) => {
+          
+            const axiosSpy = spyOn(axios, "get").and.returnValue(
+            Promise.resolve({ data: { items: [] } })
+          );
+
+          agent
+            .get(
+              `${searchPath}?perPage=1&page=2&date=2020-01-01&language=javascript&sort=test&order=asc`
+            )
+            .end((err: Error, res: Response) => {
+              pErr(err);
+              expect(axiosSpy.calls.mostRecent().args[0]).toEqual(
+                'https://api.github.com/search/repositories?q=created:>2020-01-01+language:javascript&sort=test&order=asc&page=2&per_page=1'
+              );
+              done();
+            });
+        });
+
     });
 
 });

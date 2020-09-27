@@ -14,7 +14,7 @@ export interface IRepositoriesSearch {
 }
 
 export interface IRepositoriesDao {
-    search: (query: IRepositoriesSearch) => Promise<IRepository[] | null>;
+    search: (query: IRepositoriesSearch) => Promise<IRepository[]>;
 }
 
 class RepositoriesDao implements IRepositoriesDao {
@@ -26,14 +26,13 @@ class RepositoriesDao implements IRepositoriesDao {
         order = 'desc',
         page = 0,
         perPage = 100
-    }: IRepositoriesSearch): Promise<IRepository[] | null> {
+    }: IRepositoriesSearch): Promise<IRepository[]> {
         logger.debug('Searching repositories')
         try {
             const url = `${githubUrlApi}${pathUrlSearchRepo}?q=created:>${date}${
-              (language ? `+language:${language}` : '')
+              language ? `+language:${language}` : ''
             }&sort=${sort}&order=${order}&page=${page}&per_page=${perPage}`;
-            logger.info(`URL: ${url}`)
-           
+            
             const { data } = await axios.get(url);
             return data.items.map((item: any) =>  new Repository(item)) as [IRepository];
         } catch(err) {
