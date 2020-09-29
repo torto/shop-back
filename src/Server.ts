@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
+import cors from 'cors';
 
 import express, { Request, Response, NextFunction } from 'express';
 import { BAD_REQUEST, OK } from 'http-status-codes';
@@ -19,7 +20,7 @@ const app = express();
 /************************************************************************************
  *                              Set basic express settings
  ***********************************************************************************/
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
