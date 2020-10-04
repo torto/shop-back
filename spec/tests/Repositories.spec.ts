@@ -6,9 +6,10 @@ import axios from 'axios';
 
 import app from '@server';
 import RepositoriesDao from '@daos/Repositories/RepositoriesDao';
-import Repository, { IRepository } from '@entities/Repository';
+import Repository, { IRepository, IRepositoryData } from '@entities/Repository';
 import { pErr } from '@shared/functions';
 import logger from '@shared/Logger';
+import { format, subDays } from "date-fns";
 
 describe('Repositories Routes', () => {
 
@@ -29,43 +30,72 @@ describe('Repositories Routes', () => {
 
             const repositories = [
               new Repository({
+                id: faker.random.number(),
+                created_at: faker.date.past().toISOString(),
                 name: faker.internet.userName(),
                 html_url: faker.internet.url(),
                 description: faker.commerce.productDescription(),
                 stargazers_count: faker.random.number(),
+                owner: {
+                    type: 'User',
+                    login: faker.internet.userName(),
+                    avatar_url: faker.image.imageUrl(),
+                },
               }),
               new Repository({
+                id: faker.random.number(),
+                created_at: faker.date.past().toISOString(),
                 name: faker.internet.userName(),
                 html_url: faker.internet.url(),
                 description: faker.commerce.productDescription(),
                 stargazers_count: faker.random.number(),
+                owner: {
+                    type: 'User',
+                    login: faker.internet.userName(),
+                    avatar_url: faker.image.imageUrl(),
+                },
               }),
               new Repository({
+                id: faker.random.number(),
+                created_at: faker.date.past().toISOString(),
                 name: faker.internet.userName(),
                 html_url: faker.internet.url(),
                 description: faker.commerce.productDescription(),
                 stargazers_count: faker.random.number(),
+                owner: {
+                    type: 'User',
+                    login: faker.internet.userName(),
+                    avatar_url: faker.image.imageUrl(),
+                },
               }),
               new Repository({
+                id: faker.random.number(),
+                created_at: faker.date.past().toISOString(),
                 name: faker.internet.userName(),
                 html_url: faker.internet.url(),
                 description: faker.commerce.productDescription(),
                 stargazers_count: faker.random.number(),
+                owner: {
+                    type: 'User',
+                    login: faker.internet.userName(),
+                    avatar_url: faker.image.imageUrl(),
+                },
               })
-            ];            
+          ] as IRepository[];
 
             spyOn(RepositoriesDao.prototype, "search").and.returnValue(
-              Promise.resolve(repositories)
+              Promise.resolve({data: repositories, total: 100} as IRepositoryData)
             );
 
             agent.get(searchPath)
                 .end((err: Error, res: Response) => {
                     pErr(err);
                     expect(res.status).toBe(OK);
-                    const repositoriesRes = res.body.map((repo: IRepository) => {
-                        return new Repository(repo);
+
+                    const repositoriesRes = res.body.data.map((repo: IRepository) => {
+                        return repo as IRepository;
                     });
-                    expect(repositoriesRes).toEqual(repositories);
+                    expect(repositoriesRes.length).toBe(4);
                     expect(res.body.error).toBeUndefined();
                     done();
                 });
@@ -85,24 +115,24 @@ describe('Repositories Routes', () => {
                     done();
                 });
         });
-        
+
         it(`should mount a default url in axios endpoint`, (done) => {
 
             const axiosSpy = spyOn(axios, "get").and.returnValue(
                 Promise.resolve({ data: { items: [] } }
             ));
-            
+
             agent.get(searchPath).end((err: Error, res: Response) => {
               pErr(err);
               expect(axiosSpy.calls.mostRecent().args[0]).toEqual(
-                'https://api.github.com/search/repositories?q=created:>2020-09-20&sort=starts&order=desc&page=0&per_page=100'
+                `https://api.github.com/search/repositories?q=created:>${format(subDays(new Date(), 7), "yyyy-MM-dd")}&sort=starts&order=desc&page=0&per_page=100`
               );
               done();
-            });      
+            });
         });
 
         it(`should mount a url in axios with not default values`, (done) => {
-          
+
             const axiosSpy = spyOn(axios, "get").and.returnValue(
             Promise.resolve({ data: { items: [] } })
           );

@@ -1,4 +1,4 @@
-import Repository, { IRepositoryRequest, IRepositoryData } from '@entities/Repository';
+import Repository, { IRepositoryRequest, IRepositoryData, IRepository } from '@entities/Repository';
 import { githubUrlApi, pathUrlSearchRepo } from "@shared/constants";
 import logger from "@shared/Logger";
 import axios from 'axios';
@@ -37,7 +37,7 @@ class RepositoriesDao implements IRepositoriesDao {
             const { data } = await axios.get(url);
             return {
                 total: data.total_count,
-                data: data.items.map((item: any) =>  new Repository(item)) as [IRepositoryRequest]
+                data: data.items.map((item: any) =>  new Repository(item)) as IRepository[]
             };
         } catch(err) {
             logger.error(err.message);

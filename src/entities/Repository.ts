@@ -1,6 +1,6 @@
 export interface IRepositoryData {
    total: number;
-   data: [IRepositoryRequest]
+   data: IRepository[];
 }
 
 export interface IRepositoryRequest {
@@ -8,13 +8,15 @@ export interface IRepositoryRequest {
    html_url: string;
    description: string;
    created_at: string;
-   owner: {
-       avatar_url: string;
-       type: string;
-       login: string;
-   };
+   owner: IRepositoryRequestOwner;
    stargazers_count: number;
    id: number;
+}
+
+export interface IRepositoryRequestOwner {
+    avatar_url: string;
+    type: string;
+    login: string;
 }
 export interface IRepository {
    name: string;
